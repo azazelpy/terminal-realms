@@ -16,9 +16,12 @@ sub fg { "${E}38;2;$_[0];$_[1];$_[2]m" }
 my %K = (amber => fg(255,176,40), orange => fg(255,128,24), ember => fg(214,72,20), dim => fg(120,100,90),
          text => fg(228,200,160), steel => fg(150,140,135), dark => fg(70,56,50));
 my $R0 = "${E}0m";
-my $FROST = ($ENV{REALM} || `cat "$ENV{HOME}/.config/terminal-realms/current" 2>/dev/null` || "") =~ /^frost/;
+my $REALM_NAME = ($ENV{REALM} || `cat "$ENV{HOME}/.config/terminal-realms/current" 2>/dev/null` || ""); chomp $REALM_NAME;
+my $FROST = $REALM_NAME =~ /^frost/; my $MONO = $REALM_NAME =~ /^mainframe/;
 %K = (%K, amber => fg(156,196,240), orange => fg(240,180,90), ember => fg(111,200,208), dim => fg(98,112,140),
           text => fg(200,211,230), steel => fg(140,152,176), dark => fg(40,50,70)) if $FROST;
+%K = (%K, amber => fg(235,235,235), orange => fg(200,200,200), ember => fg(150,150,150), dim => fg(100,100,100),
+          text => fg(214,214,214), steel => fg(140,140,140), dark => fg(44,44,44)) if $MONO;
 my $TEST = $ENV{BARD_TEST};
 
 my $quit = 0; $SIG{INT} = $SIG{TERM} = $SIG{HUP} = sub { $quit = 1 };
@@ -80,7 +83,7 @@ sub draw {
     my $W = $C - 4; $W = 10 if $W < 10;
     my @L;
     my $src = $np ? $np->{app} : ($station >= 0 ? 'Radio' : '');
-    my $head = "$K{ember}♪ $K{amber}THE BARD";
+    my $head = "$K{ember}♪ $K{amber}" . ($MONO ? "RADIO" : "THE BARD");
     my $right = $src ? "$K{dim}$src" : '';
     my $gap = $C - 10 - length($src) - 1; $gap = 1 if $gap < 1;
     push @L, $head . (' ' x $gap) . $right, '';
@@ -95,7 +98,7 @@ sub draw {
         push @L, "  $K{amber}\e[1m" . clip("SomaFM · $STATIONS[$station][0]", $W) . "\e[22m",
                  "  $K{text}live radio", "  $K{dim}r for the next station";
     } else {
-        push @L, "  $K{text}Silence at the bonfire.",
+        push @L, "  $K{text}" . ($MONO ? "Dead air." : $FROST ? "Silence at the lodge." : "Silence at the bonfire."),
                  "  $K{dim}Play something in Spotify or Music,",
                  "  $K{dim}or press " . (have_mpv() ? 'r for radio.' : 'space to open a player.');
     }
@@ -108,7 +111,7 @@ sub draw {
         else { $eq[$i] *= .8 }
         my $v = int($eq[$i] * 8 + .5); $v = 1 if $v < 1;
         my $k = $i / ($bars || 1);
-        my ($r, $gg, $b) = $FROST ? (int(100 + 60 * $k), int(214 - 100 * $k), int(170 + 50 * $k)) : (255, int(200 - 130 * $k), int(60 - 50 * $k));
+        my ($r, $gg, $b) = $MONO ? ((int(230 - 120 * $k)) x 3) : $FROST ? (int(100 + 60 * $k), int(214 - 100 * $k), int(170 + 50 * $k)) : (255, int(200 - 130 * $k), int(60 - 50 * $k));
         $eqs .= ($playing ? fg($r, $gg, $b) : $K{dark}) . $g[$v];
     }
     push @L, '', "  $eqs";

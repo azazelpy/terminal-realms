@@ -38,9 +38,13 @@ my %K = (amber => fg(255,176,40), orange => fg(255,128,24), ember => fg(214,72,2
          text => fg(228,200,160), steel => fg(150,140,135), cloud => fg(168,160,156), rain => fg(110,150,200),
          snow => fg(225,232,240), sun => fg(255,196,60), moon => fg(214,200,170), bolt => fg(255,226,90), fog => fg(140,132,128));
 my $R0 = "${E}0m";
-my $FROST = ($ENV{REALM} || `cat "$ENV{HOME}/.config/terminal-realms/current" 2>/dev/null` || "") =~ /^frost/;
+my $REALM_NAME = ($ENV{REALM} || `cat "$ENV{HOME}/.config/terminal-realms/current" 2>/dev/null` || ""); chomp $REALM_NAME;
+my $FROST = $REALM_NAME =~ /^frost/; my $MONO = $REALM_NAME =~ /^mainframe/;
 %K = (%K, amber => fg(156,196,240), orange => fg(240,180,90), ember => fg(111,200,208), dim => fg(98,112,140),
           text => fg(200,211,230), steel => fg(140,152,176)) if $FROST;
+%K = (%K, amber => fg(235,235,235), orange => fg(200,200,200), ember => fg(150,150,150), dim => fg(100,100,100),
+          text => fg(214,214,214), steel => fg(140,140,140), cloud => fg(170,170,170), rain => fg(130,130,130),
+          snow => fg(230,230,230), sun => fg(245,245,245), moon => fg(200,200,200), bolt => fg(255,255,255), fog => fg(120,120,120)) if $MONO;
 
 my $TEST = $ENV{SKIES_TEST};
 my $quit = 0; $SIG{INT} = $SIG{TERM} = $SIG{HUP} = sub { $quit = 1 };
@@ -68,6 +72,12 @@ my %WORDS = (0 => 'Clear', 1 => 'Mostly clear', 2 => 'Partly cloudy', 3 => 'Over
 my %LORE = (sun => 'Praise the sun!', moon => 'The moon watches the ruins.', partly => 'Light breaks through the ash.',
   moon_cloud => 'A pale moon behind the smoke.', cloud => 'The sky hangs heavy and grey.', fog => 'Fog ahead. Tread carefully.',
   rain => 'Rain falls on hollow and hale.', snow => 'Snow buries the old roads.', storm => 'The heavens rage. Seek shelter.');
+%LORE = (sun => 'Clear skies. Good day to wander.', moon => 'The moon lights the snow.', partly => 'Sun through the pines.',
+  moon_cloud => 'A pale moon behind the clouds.', cloud => 'Grey skies over the lodge.', fog => 'Fog in the valley. Stay close.',
+  rain => 'Rain on the cabin roof.', snow => 'Fresh snow on the trail.', storm => 'Storm coming. Bank the fire.') if $FROST;
+%LORE = (sun => 'Clear skies. Low latency.', moon => 'Night shift. The servers hum.', partly => 'Partly cloudy. Mostly online.',
+  moon_cloud => 'Clouds over the moon. Uplink holds.', cloud => 'Overcast. Packets still flowing.', fog => 'Fog. Low visibility, high uptime.',
+  rain => 'Rain on the window. Keep typing.', snow => 'Snow outside. Warm CPU inside.', storm => 'Storm warning. Save your work.') if $MONO;
 my %GLYPH = (sun => ['☀','sun'], moon => ['☾','moon'], partly => ['⛅','sun'], moon_cloud => ['☁','cloud'], cloud => ['☁','cloud'],
   fog => ['≡','fog'], rain => ['☂','rain'], snow => ['❄','snow'], storm => ['ϟ','bolt']);
 $GLYPH{partly} = ['☁','sun'];
@@ -110,7 +120,7 @@ sub draw {
     my ($R, $C) = size();
     my @lines;
     my @lt = localtime; my $now = clock($lt[2], $lt[1]);
-    my $title = "$K{ember}" . ($FROST ? '❄' : '☼') . " $K{amber}SKIES $K{dim}·$K{orange} $PLACE";
+    my $title = "$K{ember}" . ($FROST ? '❄' : $MONO ? '▌' : '☼') . " $K{amber}SKIES $K{dim}·$K{orange} $PLACE";
     my $gap = $C - vlen($title) - length($now) - 1; $gap = 1 if $gap < 1;
     push @lines, $title . (' ' x $gap) . "$K{dim}$now";
     if (not $d) {
@@ -126,7 +136,8 @@ sub draw {
           "$K{sun}☀ $K{text}" . hm($dl->{sunrise}[0]) . "  $K{moon}☾ $K{text}" . hm($dl->{sunset}[0]),
           '');
         for my $i (0 .. 4) { push @lines, $K{$ic->[$i][1]} . $ic->[$i][0] . $info[$i] }
-        push @lines, "  $K{ember}† $K{dim}\e[3m$LORE{$k}\e[23m $K{ember}†";
+        my $m = $FROST ? '✦' : $MONO ? '»' : '†'; my $m2 = $MONO ? '«' : $m;
+        push @lines, "  $K{ember}$m $K{dim}\e[3m$LORE{$k}\e[23m $K{ember}$m2";
         my $room = $R - @lines; my $n = $room > 4 ? 4 : $room;
         for my $i (0 .. $n - 1) {
             my $g = $GLYPH{kind($dl->{weather_code}[$i], 1)};

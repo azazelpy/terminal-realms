@@ -47,7 +47,7 @@ done
 cp "$SRC/settings.zsh.example" "$DEST/"
 [ -f "$DEST/settings.zsh" ] || cp "$SRC/settings.zsh.example" "$DEST/settings.zsh"
 [ -f "$DEST/current" ] || echo bonfire > "$DEST/current"
-chmod +x "$DEST"/panes/* "$DEST"/realms/*/screen.sh "$DEST"/realms/*/emberscreen "$DEST"/realms/*/frostfall "$DEST"/shell/stats.sh 2>/dev/null || true
+chmod +x "$DEST"/panes/* "$DEST"/realms/*/screen.sh "$DEST"/realms/*/emberscreen "$DEST"/realms/*/frostfall "$DEST"/realms/*/glyphfall "$DEST"/shell/stats.sh 2>/dev/null || true
 say "realms copied to $DEST"
 
 ZRC="${ZDOTDIR:-$HOME}/.zshrc"

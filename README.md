@@ -4,12 +4,13 @@ Cozy, animated themes for your terminal, Zellij and Neovim. Each theme is a **re
 
 ![terminal-realms demo](demo.gif)
 
-> **These are the first two realms.** More are on the way over the coming months.
+> **Three realms so far.** More are on the way over the coming months.
 
 | Realm | Vibe |
 |---|---|
 | **bonfire** | Dark Souls: a pixel bonfire, sword in the ashes, embers drifting, steel title letters. A failed command shows **YOU DIED**. |
 | **frost** | The frozen north: snowy pines, a log cabin, lanterns, the aurora over a dark navy sky. |
+| **mainframe** | Old-school black and white: a vintage CRT on a desk typing away, code rain falling behind it, a radar scope in camp. A failed command says SEGFAULT. |
 
 What you get:
 
@@ -70,6 +71,7 @@ Homebrew is installed for you if it's missing. On Linux, install the tools with 
 ```sh
 wizseb           # which realm this window is in, and the list of realms
 wizseb bonfire   # switch this window to bonfire
+wizseb mainframe # switch this window to black and white
 wizseb frost     # switch this window to frost (new windows start in the last one you picked)
 wizseb open      # open the realm's Zellij layout as a fresh session
 wizseb join      # a second window joins that same session (pick a different tab there)
